@@ -12,13 +12,26 @@
 
 	// Load the map (asynchronous)
 	d3.json("usa.json", function(error, usa) {
-	  if (error) return console.error(error);
-	  console.log(usa);
 
-	  // Once loaded
-	  svg.append("path")
-      .datum(topojson.feature(usa, usa.objects.subunits))
-      .attr("d", d3.geo.path().projection(d3.geo.mercator()));
+	  // Handle loading error
+	  if (error){
+	  	return console.error(error);
+	  	console.log(usa);
+	  } else {
+
+	  	// Use albert projection made for USA (with special representation for Alaska)
+	  	var projection = d3.geo.albersUsa()
+    		.scale(1000)
+    		.translate([width / 2, height / 2]);
+	  	var path = d3.geo.path().projection(projection);
+
+	  	var geoJson = topojson.feature(usa, usa.objects.subunits);
+	  	// Once loaded
+	  	svg.append("path")
+      	.datum(geoJson)
+      	.attr("d", path);
+	  }
+	  
 	});
 
 	var width = 960,
